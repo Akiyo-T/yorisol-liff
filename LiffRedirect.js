@@ -5,7 +5,7 @@ const LIFF_ID = '2010456176-ykpOcZre';
 const FORM_BASE_URL = 'https://docs.google.com/forms/d/1iVS20iLrgHYCPEpDJlneHUPdUnDBjcm3XS9F8UdoVPQ/viewform';
 
 // UID格納用のentry ID
-const UID_ENTRY_ID = '1311471386';
+const UID_ENTRY_ID = '1564487558';
 
 function doGet(e) {
   const html = HtmlService.createTemplate(getLiffRedirectHtml_())
