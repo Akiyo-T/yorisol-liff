@@ -7,43 +7,35 @@
 </head>
 <body style="font-family: sans-serif; text-align: center; padding-top: 40px; color: #555;">
   <p id="msg">読み込み中...</p>
-
   <script>
     var LIFF_ID = '2010456176-ykpOcZre';
-    var UID_ENTRY_ID = '1564487558';
-
-    // フォームIDマップ（流入元別）
     var FORM_MAP = {
-      'email':     '1nlFPo63RRPjlgy5Hu3K6hCZ5y7Y_QXlA0vspAd8ylWo',
-      'x':         '15MRA2qOwpdo6OCSwOL4ggNBNctSIO9Bc3s0jMpR2zl4',
-      'blog':      '1z1bbsqfqDSEARSvKMIIFN0RTRc15Vm-eRVufouWkzzs',
-      'note':      '1gTDlML2AA7JE7fv68W9rw1V74W-SXhOwN6WGf4Mvvbk',
-      'tiktok':    '1pTDNzu2V0Ry_-2rpsVOo2xVten2HzuDF2m_dJxY_v2g',
-      'threads':   '1QDqhdabh9NRasZ0pf5YnMoOJxhsWp-rV1Yk4aHye4y4',
-      'line':      '1iVS20iLrgHYCPEpDJlneHUPdUnDBjcm3XS9F8UdoVPQ',
-      'youtube':   '1kO0DYvcNimxOS_vxEj5VjHDgZSkYAL2GT3ttTWZHBdQ',
-      'instagram': '18S_ZlSj9OoTpmiSYRxZ6ujysSggIzEKmmuKLkFBLDqw'
+      'email':     { formId: '1nlFPo63RRPjlgy5Hu3K6hCZ5y7Y_QXlA0vspAd8ylWo', entryId: '2119359665' },
+      'x':         { formId: '15MRA2qOwpdo6OCSwOL4ggNBNctSIO9Bc3s0jMpR2zl4', entryId: '377649373' },
+      'blog':      { formId: '1z1bbsqfqDSEARSvKMIIFN0RTRc15Vm-eRVufouWkzzs', entryId: '2025616822' },
+      'note':      { formId: '1gTDlML2AA7JE7fv68W9rw1V74W-SXhOwN6WGf4Mvvbk', entryId: '1070204130' },
+      'tiktok':    { formId: '1pTDNzu2V0Ry_-2rpsVOo2xVten2HzuDF2m_dJxY_v2g', entryId: '1437722140' },
+      'threads':   { formId: '1QDqhdabh9NRasZ0pf5YnMoOJxhsWp-rV1Yk4aHye4y4', entryId: '1490798577' },
+      'line':      { formId: '1iVS20iLrgHYCPEpDJlneHUPdUnDBjcm3XS9F8UdoVPQ', entryId: '1699231252' },
+      'youtube':   { formId: '1kO0DYvcNimxOS_vxEj5VjHDgZSkYAL2GT3ttTWZHBdQ', entryId: '158103014' },
+      'instagram': { formId: '18S_ZlSj9OoTpmiSYRxZ6ujysSggIzEKmmuKLkFBLDqw', entryId: '112334280' }
     };
-
-    // デフォルトフォームID（LINEフォーム）
-    var DEFAULT_FORM_ID = '1iVS20iLrgHYCPEpDJlneHUPdUnDBjcm3XS9F8UdoVPQ';
-
-    // URLパラメータからsourceを取得
+    var DEFAULT = { formId: '1iVS20iLrgHYCPEpDJlneHUPdUnDBjcm3XS9F8UdoVPQ', entryId: '1699231252' };
     var urlParams = new URLSearchParams(window.location.search);
     var source = (urlParams.get('source') || '').toLowerCase();
-    var formId = FORM_MAP[source] || DEFAULT_FORM_ID;
-    var FORM_BASE_URL = 'https://docs.google.com/forms/d/' + formId + '/viewform';
-
+    var formData = FORM_MAP[source] || DEFAULT;
+    var FORM_BASE_URL = 'https://docs.google.com/forms/d/' + formData.formId + '/viewform';
+    var UID_ENTRY_ID = formData.entryId;
     document.getElementById('msg').textContent = 'Step1: HTML読み込み完了';
-
     var s = document.createElement('script');
     s.src = 'https://static.line-scdn.net/liff/edge/2/sdk.js';
     s.onload = function() {
       document.getElementById('msg').textContent = 'Step2: SDK読み込み完了。初期化中...';
       liff.init({ liffId: LIFF_ID })
         .then(function() {
-          document.getElementById('msg').textContent = 'Step3: 初期化OK';
-          if (!liff.isLoggedIn()) {
+          var isLogin = liff.isLoggedIn();
+          document.getElementById('msg').textContent = 'Step3: 初期化OK / ログイン=' + isLogin;
+          if (!isLogin) {
             liff.login();
             return;
           }
@@ -51,9 +43,11 @@
         })
         .then(function(profile) {
           if (profile && profile.userId) {
+            document.getElementById('msg').textContent = 'UID取得成功: ' + profile.userId.substring(0,8) + '...';
             var url = FORM_BASE_URL + '?usp=pp_url&entry.' + UID_ENTRY_ID + '=' + encodeURIComponent(profile.userId);
-            window.location.href = url;
+            setTimeout(function() { window.location.href = url; }, 2000);
           } else {
+            document.getElementById('msg').textContent = 'UIDなし。フォームへ移動...';
             window.location.href = FORM_BASE_URL;
           }
         })
